@@ -1,7 +1,6 @@
 import os
 import sys
 import getopt
-from xml.dom.pulldom import parseString
 import imageio
 from pydub import AudioSegment
 
@@ -22,9 +21,13 @@ def convertFile(inputPath, targetFormat):
     writer.close()
     print("Done.")
 
-def convert(inputPath, outputPath, outputFormat):
-    inputFormat = inputPath[-4:0] 
-    AudioSegment.from_file(path, format=inputFormat).export(outputPath, format=outputFormat)
+def convert(inputPath, targetFormat):
+    inputFormat = os.path.splitext(inputPath)[1][1:]
+    outputPath = os.path.splitext(inputPath)[0] + "." + targetFormat
+    print(inputPath)
+    print(inputFormat)
+
+    AudioSegment.from_file(inputPath, format=inputFormat).export(outputPath, format=targetFormat)
 
 def readme():
     print("Arguments")
@@ -41,14 +44,15 @@ if __name__ == "__main__":
 
     if(len(argv) == 0):
         readme()
+        sys.exit(1)
     elif(argv[0] == "help"):
         readme()
 
     try:
-        opts, args = getopt.getopt(argv,"i:o:g:")
+        opts, args = getopt.getopt(argv,"i:o:f:")
     except getopt.GetoptError:
-        print("empty")
-        sys.exit(2)
+        print("error")
+        sys.exit(1)
 
     for opt, arg in opts:
         print(opt, arg)
@@ -58,4 +62,9 @@ if __name__ == "__main__":
             inputfile = arg
         elif opt in ("-o"):
             outputfile = arg
+        elif opt in ("-f"):
+            pass
+
+    convert(inputfile, "wav")
+    
     
