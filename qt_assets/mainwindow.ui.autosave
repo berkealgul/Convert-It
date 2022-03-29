@@ -147,7 +147,7 @@
    <widget class="QComboBox" name="comboBox_2">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>90</x>
       <y>40</y>
       <width>72</width>
       <height>22</height>
