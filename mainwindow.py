@@ -32,8 +32,25 @@ class MainWindow(QMainWindow):
         # self.itemScrollArea.setAcceptDrops(True)
 
         # signals
-        self.pushButton.clicked.connect(self.addItem) 
 
+    def dragEnterEvent(self, event):
+        print("drag")
+        if event.mimeData().hasUrls():
+            event.accept()
+        else:
+            event.ignore()
+    
+    def dropEvent(self, event):
+        print("drop")
+
+        for url in event.mimeData().urls():
+            widget = MedieItem(self, url.toLocalFile())
+            self.vbox.addWidget(widget)    
+        
+    def addItem(self, b):
+        widget = MedieItem(self, "C:/sasd/asdsa/a")
+        self.vbox.addWidget(widget)
+    
     # def eventFilter(self, o, e):
     #     if (o.objectName() == "itemScrollArea"):
     #         if e.type() == QtCore.QEvent.DragEnter:
@@ -56,21 +73,6 @@ class MainWindow(QMainWindow):
     #     print("drop")
     #     print(event.mimeData.urls().path())
 
-
-    def dragEnterEvent(self, event):
-        print("drag")
-        if event.mimeData().hasUrls():
-            event.accept()
-        else:
-            event.ignore()
-    
-    def dropEvent(self, event):
-        print("drop")
-        print(event.mimeData.urls().path())
-
-    def addItem(self, b):
-        widget = MedieItem(self)
-        self.vbox.addWidget(widget)
            
 if __name__ == "__main__":
     app = QApplication(sys.argv)
