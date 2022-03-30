@@ -5,6 +5,7 @@ import imageio
 from pydub import AudioSegment
 
 
+
 def convertFile(inputPath, targetFormat):
     outputPath = os.path.splitext(inputPath)[0] + targetFormat
     print("converting\r\n\t{0}\r\nto\r\n\t{1}".format(inputPath, outputPath))

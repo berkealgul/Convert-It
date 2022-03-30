@@ -5,9 +5,8 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QApplication
 from PyQt5.QtCore import Qt, QSize, QMimeData
 from PyQt5.QtGui import QDrag
 from PyQt5.uic import loadUi
-from sympy import true
 
-from medieItem import MedieItem
+from widgets import *
 
 
 class MainWindow(QMainWindow):
@@ -30,6 +29,7 @@ class MainWindow(QMainWindow):
         self.itemScrollArea.setWidget(self.widget)
         # self.itemScrollArea.installEventFilter(self) 
         # self.itemScrollArea.setAcceptDrops(True)
+        self.browseButton.setMenu(FormatMenu())
 
         # signals
 
@@ -42,14 +42,9 @@ class MainWindow(QMainWindow):
     
     def dropEvent(self, event):
         print("drop")
-
         for url in event.mimeData().urls():
             widget = MedieItem(self, url.toLocalFile())
             self.vbox.addWidget(widget)    
-        
-    def addItem(self, b):
-        widget = MedieItem(self, "C:/sasd/asdsa/a")
-        self.vbox.addWidget(widget)
     
     # def eventFilter(self, o, e):
     #     if (o.objectName() == "itemScrollArea"):
