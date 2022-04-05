@@ -36,6 +36,7 @@ class MainWindow(QMainWindow):
 
     def startConversion(self):
         pass
+        #lol
 
     def assingItemToIdleThread(self):
         for i in range(self.vbox.count()):
