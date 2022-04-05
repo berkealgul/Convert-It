@@ -1,18 +1,19 @@
 import sys
 
-from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QApplication
-from PyQt5.QtCore import Qt, QSize, QMimeData
-from PyQt5.QtGui import QDrag
+from PyQt5.QtCore import Qt, QThread
 from PyQt5.uic import loadUi
 
 from widgets import *
+from converter import Converter
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         loadUi('qt_assets/mainwindow.ui', self)
+        self.n_threads = 4
+        self.threads = self.createThreads()
         self.setup_ui()   
         self.show()
         
@@ -27,46 +28,58 @@ class MainWindow(QMainWindow):
         self.itemScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.itemScrollArea.setWidgetResizable(True)
         self.itemScrollArea.setWidget(self.widget)
-        # self.itemScrollArea.installEventFilter(self) 
-        # self.itemScrollArea.setAcceptDrops(True)
-        self.browseButton.setMenu(FormatMenu())
+        
+        self.formatButton.setMenu(FormatMenu(self))
 
         # signals
+        self.convertButton.clicked.connect(self.convert)
+
+    def startConversion(self):
+        pass
+
+    def assingItemToIdleThread(self):
+        for i in range(self.vbox.count()):
+            item = self.vbox.itemAt(i).widget()
+            if item.converted is False:
+                for thread in self.threads:
+                    if not thread.isRunning():
+                        item.converted = True
+                        worker = Worker(item)
+                        return
+
+    def convert(self):
+        for i in range(self.vbox.count()):
+            item = self.vbox.itemAt(i).widget()
+            Converter.convert(item)
+    
+    def setTargetFormat(self, targetFormatAction):
+        targetFormat = targetFormatAction.text()
+        self.formatButton.setText(targetFormat)
+        
+        # set global tf
+        self.globalTargetFormat = targetFormat
+
+        # set all items tf 
+        for i in range(self.vbox.count()):
+            item = self.vbox.itemAt(i).widget()
+            item.setTargetFormat(targetFormat)
+    
+    def createThreads(self):
+        threads = []
+        for i in range(self.n_threads):
+            threads.append(QThread())
+        return threads
 
     def dragEnterEvent(self, event):
-        print("drag")
         if event.mimeData().hasUrls():
             event.accept()
         else:
             event.ignore()
     
     def dropEvent(self, event):
-        print("drop")
         for url in event.mimeData().urls():
             widget = MedieItem(self, url.toLocalFile())
             self.vbox.addWidget(widget)    
-    
-    # def eventFilter(self, o, e):
-    #     if (o.objectName() == "itemScrollArea"):
-    #         if e.type() == QtCore.QEvent.DragEnter:
-    #             self.itemDragEnterEvent(e)
-    #             return True
-    #         if e.type() == QtCore.QEvent.Drop:
-    #             self.itemDropEvent(e)
-    #             return True
-
-    #     return super().eventFilter(o, e)
-
-    # def itemDragEnterEvent(self, event):
-    #     print("drag")
-    #     if event.mimeData().hasUrls():
-    #         event.accept()
-    #     else:
-    #         event.ignore()
-    
-    # def itemDropEvent(self, event):
-    #     print("drop")
-    #     print(event.mimeData.urls().path())
 
            
 if __name__ == "__main__":

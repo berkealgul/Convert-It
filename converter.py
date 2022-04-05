@@ -1,11 +1,31 @@
 import os
 import sys
-import getopt
 import imageio
 from pydub import AudioSegment
+from widgets import MedieItem
 
 
+formats = {"Audio" : ["mp3", "wav", "m4a"],
+            "Image" : ["png", "jpeg", "jpg"]}
 
+class Converter:
+    def convert(inputPath, inputFormat, targetDir, targetFormat, inputName):
+        targetPath = targetDir+inputName+"."+targetFormat
+        AudioSegment.from_file(inputPath, format=inputFormat).export(targetPath, format=targetFormat)
+        print("Complete")
+    
+    def convert(mediaItem, globalTargetDir=None):
+        # if there is none global dir use input dir
+        if globalTargetDir is None:
+            targetPath = "C:/Berke/"+mediaItem.name+"."+"mp3"
+        else:
+            targetPath = globalTargetDir+mediaItem.name+"."+"mp3"
+
+        AudioSegment.from_file(mediaItem.path, format=mediaItem.format).export(targetPath, format="mp3")
+        print("Complete")
+
+
+# ----------IRRELEVANT BELLOW------------
 def convertFile(inputPath, targetFormat):
     outputPath = os.path.splitext(inputPath)[0] + targetFormat
     print("converting\r\n\t{0}\r\nto\r\n\t{1}".format(inputPath, outputPath))
@@ -39,7 +59,7 @@ def readme():
 
 
 if __name__ == "__main__":
-    print(sys.argv)
+    import getopt
 
     argv = sys.argv[1:]
 
