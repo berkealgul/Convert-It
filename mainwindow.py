@@ -5,16 +5,18 @@ from PyQt5.QtCore import Qt, QThread
 from PyQt5.uic import loadUi
 
 from widgets import *
-from converter import Converter
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         loadUi('qt_assets/mainwindow.ui', self)
-        self.n_threads = 4
-        self.threads = self.createThreads()
-        self.setup_ui()   
+        self.converterThread = self.createConverterThread()
+        self.setup_ui() 
+
+        # test case 
+        self.TEST_CASE()
+
         self.show()
         
     def setup_ui(self):
@@ -32,30 +34,50 @@ class MainWindow(QMainWindow):
         self.formatButton.setMenu(FormatMenu(self))
 
         # signals
-        self.convertButton.clicked.connect(self.convert)
+        self.convertButton.clicked.connect(self.conversionState)
 
-    def startConversion(self):
+    def addItem(self, path):
+        widget = MediaItem(self, path)
+        self.vbox.addWidget(widget)    
+
+    def createConverterThread(self):
+        thread = ConverterThread(self)
+        thread.finished.connect(self.pickItemToConvert)
+        return thread
+
+    def pickItemToConvert(self):
+        for i in range(self.vbox.count()):
+            item = self.vbox.itemAt(i).widget()
+            if not item.converted:
+                item.converted = True
+                self.converterThread.startConvertItem(item)
+                break # abort after picking
+        
+        """ for i in range(self.vbox.count()):
+            item = self.vbox.itemAt(i).widget()
+            print(item.converted) """
+        
+        # if couldnt find anything we reset the state
+        pass # for now
+            
+    # program has two states
+    # one is "idle" state user can interact with app normally 
+    # on the other hand other state is "conversion" step,
+    # this state activates after user starts the conversion process
+    # during this state some changes are on ui expected
+    def conversionState(self):
+        self.pickItemToConvert()
+    
+    # this reverts every changes conversion state does
+    def idleState(self):
         pass
-
-    def assingItemToIdleThread(self):
-        for i in range(self.vbox.count()):
-            item = self.vbox.itemAt(i).widget()
-            if item.converted is False:
-                for thread in self.threads:
-                    if not thread.isRunning():
-                        item.converted = True
-                        worker = Worker(item)
-                        return
-
-    def convert(self):
-        for i in range(self.vbox.count()):
-            item = self.vbox.itemAt(i).widget()
-            Converter.convert(item)
     
     def setTargetFormat(self, targetFormatAction):
-        targetFormat = targetFormatAction.text()
+        self.setTargetFormatByText(targetFormatAction.text())
+    
+    def setTargetFormatByText(self, targetFormat):
         self.formatButton.setText(targetFormat)
-        
+
         # set global tf
         self.globalTargetFormat = targetFormat
 
@@ -63,12 +85,6 @@ class MainWindow(QMainWindow):
         for i in range(self.vbox.count()):
             item = self.vbox.itemAt(i).widget()
             item.setTargetFormat(targetFormat)
-    
-    def createThreads(self):
-        threads = []
-        for i in range(self.n_threads):
-            threads.append(QThread())
-        return threads
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
@@ -78,9 +94,19 @@ class MainWindow(QMainWindow):
     
     def dropEvent(self, event):
         for url in event.mimeData().urls():
-            widget = MedieItem(self, url.toLocalFile())
-            self.vbox.addWidget(widget)    
+            self.addItem(url.toLocalFile())
 
+    def closeEvent(self, event):
+        self.converterThread.quit() # quit worker thread
+        return super().closeEvent(event)
+
+    # uitlity function to generate test senario
+    # add 3 music files and set target to wav
+    def TEST_CASE(self):
+        self.addItem("C:\Berke\Portal 2 OST\Portal2-03-FrankenTurrets.mp3")
+        self.addItem("C:\Berke\Portal 2 OST\Portal2-05-Excursion_Funnel.mp3")
+        self.addItem("C:\Berke\Portal 2 OST\Portal2-06-Overgrowth.mp3")
+        self.setTargetFormatByText("wav")
            
 if __name__ == "__main__":
     app = QApplication(sys.argv)
