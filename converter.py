@@ -2,7 +2,6 @@ import os
 import sys
 import imageio
 from pydub import AudioSegment
-from widgets import MedieItem
 
 
 formats = {"Audio" : ["mp3", "wav", "m4a"],
@@ -17,9 +16,9 @@ class Converter:
     def convert(mediaItem, globalTargetDir=None):
         # if there is none global dir use input dir
         if globalTargetDir is None:
-            targetPath = "C:/Berke/"+mediaItem.name+"."+"mp3"
+            targetPath = "C:/Berke/"+mediaItem.name+"."+mediaItem.targetFormat
         else:
-            targetPath = globalTargetDir+mediaItem.name+"."+"mp3"
+            targetPath = globalTargetDir+mediaItem.name+"."+mediaItem.targetFormat
 
         AudioSegment.from_file(mediaItem.path, format=mediaItem.format).export(targetPath, format="mp3")
         print("Complete")
