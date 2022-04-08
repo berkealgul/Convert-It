@@ -1,8 +1,9 @@
 import os
 from turtle import width
 
-from PyQt5.QtCore import QThread, QObject
+from PyQt5.QtCore import QThread
 from PyQt5.QtWidgets import QWidget, QMenu, QAction
+from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.uic import loadUi
 
 from converter import Converter
@@ -15,6 +16,10 @@ class MediaItem(QWidget):
         self.path = os.path.normpath(mediaPath)
         self.main_window = main_window
         self.converted = False
+
+        self.completedPixMap = QPixmap("icons/ok-green.png")
+        self.completedIcon = QIcon(self.completedPixMap)
+        self.idleIcon = QIcon()
 
         self.processPath()
         self.init_ui()
@@ -30,9 +35,24 @@ class MediaItem(QWidget):
 
         self.itemlabel.setText(self.name)
 
+        #buttons
+        pixmap = QPixmap("icons\\trash.png")
+        icon = QIcon(pixmap)
+        size = pixmap.rect().size()/3
+        self.deleteButton.setIcon(icon)
+        self.deleteButton.setIconSize(size)
+        self.deleteButton.setFixedSize(size)
+
+        self.statusIconButton.setEnabled(True)
+        self.statusIconButton.setIcon(self.idleIcon)
+        self.statusIconButton.setFixedSize(self.completedPixMap.rect().size()/3)
+
         #signals
         self.deleteButton.clicked.connect(self.deleteLater) 
     
+    def completed(self):
+        self.statusIconButton.setIcon(self.completedIcon)
+
     def setTargetFormat(self, targetFormat):
         self.targetFormat = targetFormat
         self.formatLabel.setText(self.targetFormat)
@@ -70,3 +90,4 @@ class ConverterThread(QThread):
 
     def run(self):
         Converter.convert(self.mediaItem)
+        self.mediaItem.completed()
