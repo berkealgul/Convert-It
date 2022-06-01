@@ -54,10 +54,6 @@ class MainWindow(QMainWindow):
                 self.converterThread.startConvertItem(item)
                 break # exit after picking
         
-        """ for i in range(self.vbox.count()):
-            item = self.vbox.itemAt(i).widget()
-            print(item.converted) """
-        
         # if couldnt find anything we reset the state
         self.idleState()
 
