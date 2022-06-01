@@ -7,8 +7,6 @@ from PyQt5.uic import loadUi
 from widgets import *
 
 
-# icons by <aS target="_blank" href="https://icons8.com/icon/KPhFC2OwpbWV/delete">Delete</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -20,6 +18,7 @@ class MainWindow(QMainWindow):
         
     def setup_ui(self):
         self.setAcceptDrops(True)
+        self.setWindowTitle("ConvertIt")
         # setting up scroll bar
         self.widget = QWidget()
         self.vbox = QVBoxLayout()
@@ -53,14 +52,14 @@ class MainWindow(QMainWindow):
             if not item.converted:
                 item.converted = True
                 self.converterThread.startConvertItem(item)
-                break # abort after picking
+                break # exit after picking
         
         """ for i in range(self.vbox.count()):
             item = self.vbox.itemAt(i).widget()
             print(item.converted) """
         
         # if couldnt find anything we reset the state
-        pass # for now
+        self.idleState()
 
     def abortConversion(self):
         self.converterThread.quit()
@@ -75,12 +74,14 @@ class MainWindow(QMainWindow):
         self.convertButton.setEnabled(False)
         self.conversionProgressBar.setMaximum(self.vbox.count())
         self.pickItemToConvert()
+        self.stateLabel.setText("Converting...")
     
     # this reverts every changes conversion state does
     def idleState(self):
         self.convertButton.setEnabled(True)
         self.conversionProgressBar.setValue(0)
         self.n_convertedItems = 0
+        self.stateLabel.setText(" ")
         
     def setTargetFormat(self, targetFormatAction):
         self.setTargetFormatByText(targetFormatAction.text())

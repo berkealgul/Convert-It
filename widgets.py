@@ -5,8 +5,10 @@ from PyQt5.QtCore import QThread
 from PyQt5.QtWidgets import QWidget, QMenu, QAction
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.uic import loadUi
+from sympy import Q
 
 from converter import Converter
+
 
 
 class MediaItem(QWidget):
@@ -17,13 +19,16 @@ class MediaItem(QWidget):
         self.main_window = main_window
         self.converted = False
 
-        self.completedPixMap = QPixmap("icons/ok-green.png")
+        self.completedPixMap = QPixmap("icons/ok.png")
         self.completedIcon = QIcon(self.completedPixMap)
         self.idleIcon = QIcon()
-
+        
         self.processPath()
         self.init_ui()
-        
+
+    def getMediaPixmap(self):
+        return QPixmap("icons/image.png")
+
     def processPath(self):
         self.name = self.path.split(os.sep)[-1]
         self.format = None
@@ -47,16 +52,23 @@ class MediaItem(QWidget):
         self.statusIconButton.setIcon(self.idleIcon)
         self.statusIconButton.setFixedSize(self.completedPixMap.rect().size()/3)
 
+        self.mediaIconLabel.setPixmap(self.getMediaPixmap())
+
+        self.formatLabel.setText(self.getSizeInfo())
+
         #signals
         self.deleteButton.clicked.connect(self.deleteLater) 
     
+    def getSizeInfo(self):
+        mb = os.path.getsize(self.path) / 1048576
+        return str(round(mb, 2)) + " MB" 
+
     def completed(self):
         self.statusIconButton.setIcon(self.completedIcon)
 
     def setTargetFormat(self, targetFormat):
         self.targetFormat = targetFormat
-        self.formatLabel.setText(self.targetFormat)
-
+        
 
 class FormatMenu(QMenu):
     def __init__(self, mainWindow):
