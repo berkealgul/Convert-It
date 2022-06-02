@@ -7,8 +7,6 @@ from PyQt5.uic import loadUi
 from widgets import *
 
 
-# icons by <aS target="_blank" href="https://icons8.com/icon/KPhFC2OwpbWV/delete">Delete</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -20,6 +18,8 @@ class MainWindow(QMainWindow):
         
     def setup_ui(self):
         self.setAcceptDrops(True)
+        self.setWindowTitle("ConvertIt")
+        self.setFixedSize(self.size())
         # setting up scroll bar
         self.widget = QWidget()
         self.vbox = QVBoxLayout()
@@ -36,7 +36,6 @@ class MainWindow(QMainWindow):
         # signals
         self.convertButton.clicked.connect(self.conversionState)
         self.converterThread.finished.connect(self.pickItemToConvert)
-        self.converterThread.finished.connect(self.updateProgressBar)
         self.cancelButton.clicked.connect(self.abortConversion)
 
     def addItem(self, path):
@@ -51,16 +50,14 @@ class MainWindow(QMainWindow):
         for i in range(self.vbox.count()):
             item = self.vbox.itemAt(i).widget()
             if not item.converted:
+                # pick item and pass it to worker thread
                 item.converted = True
                 self.converterThread.startConvertItem(item)
-                break # abort after picking
-        
-        """ for i in range(self.vbox.count()):
-            item = self.vbox.itemAt(i).widget()
-            print(item.converted) """
+                self.updateProgressBar()
+                return # exit from function after picking
         
         # if couldnt find anything we reset the state
-        pass # for now
+        self.idleState()
 
     def abortConversion(self):
         self.converterThread.quit()
@@ -75,12 +72,14 @@ class MainWindow(QMainWindow):
         self.convertButton.setEnabled(False)
         self.conversionProgressBar.setMaximum(self.vbox.count())
         self.pickItemToConvert()
+        self.stateLabel.setText("Converting...")
     
     # this reverts every changes conversion state does
     def idleState(self):
         self.convertButton.setEnabled(True)
         self.conversionProgressBar.setValue(0)
         self.n_convertedItems = 0
+        self.stateLabel.setText(" ")
         
     def setTargetFormat(self, targetFormatAction):
         self.setTargetFormatByText(targetFormatAction.text())
