@@ -19,6 +19,7 @@ class MainWindow(QMainWindow):
     def setup_ui(self):
         self.setAcceptDrops(True)
         self.setWindowTitle("ConvertIt")
+        self.setFixedSize(self.size())
         # setting up scroll bar
         self.widget = QWidget()
         self.vbox = QVBoxLayout()
@@ -35,7 +36,6 @@ class MainWindow(QMainWindow):
         # signals
         self.convertButton.clicked.connect(self.conversionState)
         self.converterThread.finished.connect(self.pickItemToConvert)
-        self.converterThread.finished.connect(self.updateProgressBar)
         self.cancelButton.clicked.connect(self.abortConversion)
 
     def addItem(self, path):
@@ -50,9 +50,11 @@ class MainWindow(QMainWindow):
         for i in range(self.vbox.count()):
             item = self.vbox.itemAt(i).widget()
             if not item.converted:
+                # pick item and pass it to worker thread
                 item.converted = True
                 self.converterThread.startConvertItem(item)
-                break # exit after picking
+                self.updateProgressBar()
+                return # exit from function after picking
         
         # if couldnt find anything we reset the state
         self.idleState()

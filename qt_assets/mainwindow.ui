@@ -67,12 +67,12 @@ border-color: black;
 border-width: 1px;
 border-radius: 10px;
 font: 63 8pt &quot;Segoe UI Semibold&quot;;
-color : white;
+color : black;
 }
 
 QPushButton:hover{ 
  	background-color:  #F4FBFB; 
-	color : #40DD82;
+	color : black;
 }
 </string>
     </property>
@@ -120,12 +120,12 @@ border-color: black;
 border-width: 1px;
 border-radius: 10px;
 font: 63 8pt &quot;Segoe UI Semibold&quot;;
-color : white;
+color : black;
 }
 
 QPushButton:hover{ 
  	background-color:  #F4FBFB; 
-	color : #40DD82;
+	color : black;
 }
 </string>
     </property>
@@ -150,12 +150,12 @@ border-color: black;
 border-width: 1px;
 border-radius: 10px;
 font: 63 8pt &quot;Segoe UI Semibold&quot;;
-color : white;
+color : black;
 }
 
 QPushButton:hover{ 
  	background-color:  #F4FBFB; 
-	color : #40DD82;
+	color : black;
 }
 
 </string>
@@ -217,12 +217,12 @@ border-color: black;
 border-width: 1px;
 border-radius: 10px;
 font: 63 8pt &quot;Segoe UI Semibold&quot;;
-color : white;
+color : black;
 }
 
 QPushButton:hover{ 
  	background-color:  #F4FBFB; 
-	color : #40DD82;
+	color : black;
 }
 
 </string>

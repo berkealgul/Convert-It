@@ -1,14 +1,9 @@
 import os
-from turtle import width
-
 from PyQt5.QtCore import QThread
-from PyQt5.QtWidgets import QWidget, QMenu, QAction
+from PyQt5.QtWidgets import QWidget, QMenu, QAction, QMessageBox
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.uic import loadUi
-from sympy import Q
-
-from converter import Converter
-
+from converter import *
 
 
 class MediaItem(QWidget):
@@ -18,21 +13,38 @@ class MediaItem(QWidget):
         self.path = os.path.normpath(mediaPath)
         self.main_window = main_window
         self.converted = False
+        self.conversionError = None
 
         self.completedPixMap = QPixmap("icons/ok.png")
         self.completedIcon = QIcon(self.completedPixMap)
         self.idleIcon = QIcon()
+        self.errorIcon = QIcon(QPixmap("icons/error.png"))
+        self.convertingIcon = QIcon(QPixmap("icons/clock.png"))
         
         self.processPath()
         self.init_ui()
 
     def getMediaPixmap(self):
-        return QPixmap("icons/image.png")
+        mediaType = formatType(self.format)
+        if mediaType == "Image":
+            return QPixmap("icons/image.png")
+        elif mediaType == "Audio":
+            return QPixmap("icons/audio.png")
+        elif mediaType == "Video":
+            return QPixmap("icons/video.png")
+
+    def getDir(self, splittedPath):
+        dir = ""
+        for p in splittedPath:
+            dir += p + "\\"
+        return dir
 
     def processPath(self):
-        self.name = self.path.split(os.sep)[-1]
-        self.format = None
-        self.targetFormat = None
+        splittedPath = self.path.split(os.sep)
+        self.dir = self.getDir(splittedPath[:-1])
+        mediaName = splittedPath[-1]
+        self.format = mediaName.split(".")[-1]
+        self.name = mediaName.split(".")[0]
 
     def init_ui(self):
         self.setMinimumHeight(self.geometry().height())   
@@ -48,23 +60,38 @@ class MediaItem(QWidget):
         self.deleteButton.setIconSize(size)
         self.deleteButton.setFixedSize(size)
 
-        self.statusIconButton.setEnabled(True)
+        self.statusIconButton.setEnabled(False)
         self.statusIconButton.setIcon(self.idleIcon)
         self.statusIconButton.setFixedSize(self.completedPixMap.rect().size()/3)
-
         self.mediaIconLabel.setPixmap(self.getMediaPixmap())
-
         self.formatLabel.setText(self.getSizeInfo())
 
         #signals
         self.deleteButton.clicked.connect(self.deleteLater) 
+        self.statusIconButton.clicked.connect(self.showError)
     
     def getSizeInfo(self):
         mb = os.path.getsize(self.path) / 1048576
         return str(round(mb, 2)) + " MB" 
+    
+    def onBeginConversion(self):
+        self.statusIconButton.setIcon(self.convertingIcon)
 
-    def completed(self):
-        self.statusIconButton.setIcon(self.completedIcon)
+    def showError(self):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Critical)
+        msg.setText(self.conversionError)
+        msg.setWindowTitle("Failed :(")
+        msg.exec_()
+
+    def onConverted(self, result, error):
+        if result == COMPLETED:
+            self.statusIconButton.setEnabled(False)
+            self.statusIconButton.setIcon(self.completedIcon)
+        else: # in case of error
+            self.statusIconButton.setIcon(self.errorIcon)
+            self.statusIconButton.setEnabled(True)
+            self.conversionError = error
 
     def setTargetFormat(self, targetFormat):
         self.targetFormat = targetFormat
@@ -74,7 +101,7 @@ class FormatMenu(QMenu):
     def __init__(self, mainWindow):
         super().__init__()
         self.mainWindow = mainWindow
-        data = {"Audio":["mp3", "wav"], "image":["png", "jpeg"]}
+        data = formats
         self.setup_menu(data, self)
         self.triggered[QAction].connect(mainWindow.setTargetFormat)
 
@@ -101,5 +128,6 @@ class ConverterThread(QThread):
         self.start()
 
     def run(self):
-        Converter.convert(self.mediaItem)
-        self.mediaItem.completed()
+        self.mediaItem.onBeginConversion()
+        result, error = convert(self.mediaItem)
+        self.mediaItem.onConverted(result, error)
