@@ -32,6 +32,8 @@ class MediaItem(QWidget):
             return QPixmap("icons/audio.png")
         elif mediaType == "Video":
             return QPixmap("icons/video.png")
+        else:
+            return QPixmap("icons/image.png") # default icon to not crash the app
 
     def getDir(self, splittedPath):
         dir = ""

@@ -37,6 +37,10 @@ class MainWindow(QMainWindow):
         self.convertButton.clicked.connect(self.conversionState)
         self.converterThread.finished.connect(self.pickItemToConvert)
         self.cancelButton.clicked.connect(self.abortConversion)
+        self.browseButton.clicked.connect(self.browseSaveFolder)
+
+    def browseSaveFolder(self):
+        pass
 
     def addItem(self, path):
         widget = MediaItem(self, path)
@@ -52,6 +56,7 @@ class MainWindow(QMainWindow):
             if not item.converted:
                 # pick item and pass it to worker thread
                 item.converted = True
+                item.setTargetFormat(self.globalTargetFormat)
                 self.converterThread.startConvertItem(item)
                 self.updateProgressBar()
                 return # exit from function after picking

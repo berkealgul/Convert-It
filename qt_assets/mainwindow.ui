@@ -90,11 +90,24 @@ QPushButton:hover{
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: #e3e3e3;
+     <string notr="true">
+QProgressBar {
+background-color: #e3e3e3;
 border-style: solid;
 border-color: black;
 border-width: 1px;
-</string>
+border-radius: 10px;
+
+}
+
+QProgressBar::chunk {
+     background-color: #40DD82;   
+	 border-bottom-right-radius:7.5px;
+    border-bottom-left-radius: 7.5px;
+ 	border-top-right-radius:7.5px;
+    border-top-left-radius: 7.5px;
+
+ }</string>
     </property>
     <property name="value">
      <number>0</number>
