@@ -21,7 +21,7 @@ class MainWindow(QMainWindow):
         
     def setup_ui(self):
         self.setAcceptDrops(True)
-        self.setWindowTitle("ConvertIt")
+        self.setWindowTitle("Convert-It")
         self.setFixedSize(self.size())
         # setting up scroll bar
         self.widget = QWidget()
