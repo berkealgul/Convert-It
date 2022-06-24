@@ -1,6 +1,6 @@
 import sys
 
-from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QApplication
+from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QApplication, QFileDialog
 from PyQt5.QtCore import Qt, QThread
 from PyQt5.uic import loadUi
 
@@ -12,6 +12,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         loadUi('qt_assets/mainwindow.ui', self)
         self.n_convertedItems = 0
+        self.globalSaveDir = None
         self.setup_ui() 
         self.TEST_CASE() # test case 
         self.show()
@@ -40,7 +41,12 @@ class MainWindow(QMainWindow):
         self.browseButton.clicked.connect(self.browseSaveFolder)
 
     def browseSaveFolder(self):
-        pass
+        self.globalSaveDir = QFileDialog.getExistingDirectory(self, "Browse Save Directory",
+                                       "/home",
+                                       QFileDialog.ShowDirsOnly
+                                       | QFileDialog.DontResolveSymlinks)
+        self.globalSaveDir += "/" # qt dosent add this at the end
+        self.saveDirLabel.setText(str(self.globalSaveDir))
 
     def addItem(self, path):
         widget = MediaItem(self, path)
@@ -57,7 +63,7 @@ class MainWindow(QMainWindow):
                 # pick item and pass it to worker thread
                 item.converted = True
                 item.setTargetFormat(self.globalTargetFormat)
-                self.converterThread.startConvertItem(item)
+                self.converterThread.startConvertItem(item, self.globalSaveDir)
                 self.updateProgressBar()
                 return # exit from function after picking
         
@@ -74,6 +80,11 @@ class MainWindow(QMainWindow):
     # this state activates after user starts the conversion process
     # during this state some changes on ui is expected
     def conversionState(self):
+        for i in range(self.vbox.count()):
+            item = self.vbox.itemAt(i).widget()
+            item.converted = False
+            item.statusIconButton.setIcon(item.idleIcon)
+
         self.convertButton.setEnabled(False)
         self.conversionProgressBar.setMaximum(self.vbox.count())
         self.pickItemToConvert()

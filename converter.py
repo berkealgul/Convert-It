@@ -10,6 +10,7 @@ formats = {"Audio" : ["aac", "mp3", "wav", "m4a"],
             "Image" : ["png", "jpeg", "jpg"],
             "Video" : ["mp4"]}
 
+# coversion result codes
 COMPLETED = 0
 ERROR_INVALID_FORMAT = 1
 UNKNOWN_ERROR = -1

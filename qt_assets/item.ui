@@ -27,7 +27,7 @@
   </property>
   <layout class="QHBoxLayout" name="_2">
    <property name="spacing">
-    <number>0</number>
+    <number>5</number>
    </property>
    <property name="leftMargin">
     <number>3</number>
@@ -56,17 +56,14 @@
    </item>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>10</number>
+     </property>
      <property name="sizeConstraint">
       <enum>QLayout::SetMaximumSize</enum>
      </property>
      <item>
-      <widget class="QLabel" name="itemlabel">
-       <property name="minimumSize">
-        <size>
-         <width>175</width>
-         <height>0</height>
-        </size>
-       </property>
+      <widget class="QLineEdit" name="itemLabel">
        <property name="maximumSize">
         <size>
          <width>175</width>
@@ -74,8 +71,7 @@
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">font: 63 8pt &quot;Segoe UI Semibold&quot;;
-color : black;</string>
+        <string notr="true">QLineEdit { border: none }</string>
        </property>
        <property name="text">
         <string>Music</string>
