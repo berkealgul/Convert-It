@@ -6,9 +6,9 @@ from pydub import AudioSegment
 import moviepy.editor as mp
 
 
-formats = {"Audio" : ["aac", "mp3", "wav", "m4a"],
-            "Image" : ["png", "jpeg", "jpg"],
-            "Video" : ["mp4"]}
+formats = {"Audio" : ["mp3", "wav", "flac", "ogg", "aiff", "m4a", "acc", "wma"],
+            "Image" : ["bmp", "png", "jpeg", "jpg", "gif", "webp", "tiff", "raw", "svg", "tga", "tiff"],
+            "Video" : ["mp4", "mkv", "flv", "avi", "webm", "wmv", "ogv", "mpg", "mov"]}
 
 # coversion result codes
 COMPLETED = 0

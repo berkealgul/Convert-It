@@ -1,7 +1,8 @@
 import sys
 
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QApplication, QFileDialog
-from PyQt5.QtCore import Qt, QThread
+from PyQt5.QtCore import Qt, QUrl
+from PyQt5.QtGui import QDesktopServices
 from PyQt5.uic import loadUi
 
 from widgets import *
@@ -13,6 +14,7 @@ class MainWindow(QMainWindow):
         loadUi('qt_assets/mainwindow.ui', self)
         self.n_convertedItems = 0
         self.globalSaveDir = None
+        self.repoUrl = QUrl("https://github.com/berkealgul/Sound-Video-Converter")
         self.setup_ui() 
         self.TEST_CASE() # test case 
         self.show()
@@ -39,6 +41,10 @@ class MainWindow(QMainWindow):
         self.converterThread.finished.connect(self.pickItemToConvert)
         self.cancelButton.clicked.connect(self.abortConversion)
         self.browseButton.clicked.connect(self.browseSaveFolder)
+        self.helpButton.clicked.connect(self.openGitRepo)
+
+    def openGitRepo(self):
+        QDesktopServices.openUrl(self.repoUrl)
 
     def browseSaveFolder(self):
         self.globalSaveDir = QFileDialog.getExistingDirectory(self, "Browse Save Directory",
