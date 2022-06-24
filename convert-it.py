@@ -14,7 +14,7 @@ class MainWindow(QMainWindow):
         loadUi('qt_assets/mainwindow.ui', self)
         self.n_convertedItems = 0
         self.globalSaveDir = None
-        self.repoUrl = QUrl("https://github.com/berkealgul/Sound-Video-Converter")
+        self.repoUrl = QUrl("https://github.com/berkealgul/Convert-It")
         self.setup_ui() 
         self.TEST_CASE() # test case 
         self.show()
@@ -43,8 +43,9 @@ class MainWindow(QMainWindow):
         self.browseButton.clicked.connect(self.browseSaveFolder)
         self.helpButton.clicked.connect(self.openGitRepo)
 
-    def openGitRepo(self):
-        QDesktopServices.openUrl(self.repoUrl)
+    def addItem(self, path):
+        widget = MediaItem(self, path)
+        self.vbox.addWidget(widget)   
 
     def browseSaveFolder(self):
         self.globalSaveDir = QFileDialog.getExistingDirectory(self, "Browse Save Directory",
@@ -53,10 +54,6 @@ class MainWindow(QMainWindow):
                                        | QFileDialog.DontResolveSymlinks)
         self.globalSaveDir += "/" # qt dosent add this at the end
         self.saveDirLabel.setText(str(self.globalSaveDir))
-
-    def addItem(self, path):
-        widget = MediaItem(self, path)
-        self.vbox.addWidget(widget)    
 
     def updateProgressBar(self):
         self.n_convertedItems = self.n_convertedItems+1
@@ -95,6 +92,20 @@ class MainWindow(QMainWindow):
         self.conversionProgressBar.setMaximum(self.vbox.count())
         self.pickItemToConvert()
         self.stateLabel.setText("Converting...")
+
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.accept()
+        else:
+            event.ignore()
+    
+    def dropEvent(self, event):
+        for url in event.mimeData().urls():
+            self.addItem(url.toLocalFile())
+
+    def closeEvent(self, event):
+        self.converterThread.quit() # quit worker thread
+        return super().closeEvent(event)
     
     # this reverts every changes conversion state does
     def idleState(self):
@@ -117,19 +128,8 @@ class MainWindow(QMainWindow):
             item = self.vbox.itemAt(i).widget()
             item.setTargetFormat(targetFormat)
 
-    def dragEnterEvent(self, event):
-        if event.mimeData().hasUrls():
-            event.accept()
-        else:
-            event.ignore()
-    
-    def dropEvent(self, event):
-        for url in event.mimeData().urls():
-            self.addItem(url.toLocalFile())
-
-    def closeEvent(self, event):
-        self.converterThread.quit() # quit worker thread
-        return super().closeEvent(event)
+    def openGitRepo(self):
+        QDesktopServices.openUrl(self.repoUrl)
 
     # uitlity function to generate test senario
     # add 3 music files and set target to wav
