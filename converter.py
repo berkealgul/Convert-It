@@ -3,12 +3,14 @@ import sys
 import imageio
 from PIL import Image   
 from pydub import AudioSegment
+import moviepy.editor as mp
 
 
 formats = {"Audio" : ["aac", "mp3", "wav", "m4a"],
             "Image" : ["png", "jpeg", "jpg"],
             "Video" : ["mp4"]}
 
+# coversion result codes
 COMPLETED = 0
 ERROR_INVALID_FORMAT = 1
 UNKNOWN_ERROR = -1
@@ -26,22 +28,28 @@ def convert(mediaItem, globalTargetDir=None):
         targetPath = globalTargetDir + mediaItem.name + "." + mediaItem.targetFormat
 
     inputType = formatType(mediaItem.format)
-    targetType = formatType(mediaItem.format)
-
+    targetType = formatType(mediaItem.targetFormat)
 
     if inputType is None or targetType is None:
         return ERROR_INVALID_FORMAT
     try:
         if inputType == targetType == "Audio":
-            AudioSegment.from_file(mediaItem.path, format=mediaItem.format).export(targetPath, format="mp3")
+            AudioSegment.from_file(mediaItem.path, format=mediaItem.format).export(targetPath, mediaItem.targetFormat)
         elif inputType == targetType == "Image":
             Image.open(mediaItem.path).save(targetPath)
         elif inputType == targetType == "Video":
-            print("video-video") 
+            clip = mp.VideoFileClip(mediaItem.path)
+            clip.write_videofile(targetPath)
         elif inputType == "Video" and targetType == "Audio":
-            print("video-audio")
+            clip = mp.VideoFileClip(mediaItem.path)
+            clip.audio.write_audiofile(targetPath)
     except Exception as e:
         print(e)
         return UNKNOWN_ERROR, str(e)
 
     return COMPLETED, None
+
+# unused for now
+def convertVideoToSound(videoPath, soundPath):
+    clip = mp.VideoFileClip(videoPath)
+    clip.audio.write_audiofile(soundPath)

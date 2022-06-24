@@ -27,11 +27,13 @@ class MediaItem(QWidget):
     def getMediaPixmap(self):
         mediaType = formatType(self.format)
         if mediaType == "Image":
-            return QPixmap("icons/image.png")
+            return QPixmap("icons/image2.png")
         elif mediaType == "Audio":
-            return QPixmap("icons/audio.png")
+            return QPixmap("icons/audio2.png")
         elif mediaType == "Video":
-            return QPixmap("icons/video.png")
+            return QPixmap("icons/video2.png")
+        else:
+            return QPixmap() # default icon to not crash the app
 
     def getDir(self, splittedPath):
         dir = ""
@@ -50,7 +52,7 @@ class MediaItem(QWidget):
         self.setMinimumHeight(self.geometry().height())   
         self.setMinimumWidth(self.geometry().width())   
 
-        self.itemlabel.setText(self.name)
+        self.itemLabel.setText(self.name)
 
         #buttons
         pixmap = QPixmap("icons\\trash.png")
@@ -69,7 +71,11 @@ class MediaItem(QWidget):
         #signals
         self.deleteButton.clicked.connect(self.deleteLater) 
         self.statusIconButton.clicked.connect(self.showError)
+        self.itemLabel.textChanged.connect(self.changeName)
     
+    def changeName(self, name):
+        self.name = name
+
     def getSizeInfo(self):
         mb = os.path.getsize(self.path) / 1048576
         return str(round(mb, 2)) + " MB" 
@@ -122,12 +128,14 @@ class FormatMenu(QMenu):
 class ConverterThread(QThread):
     def __init__(self, mainWindow):
         super().__init__(parent=mainWindow)
+        self.saveDir = None
 
-    def startConvertItem(self, mediaItem):
+    def startConvertItem(self, mediaItem, saveDir):
         self.mediaItem = mediaItem
+        self.saveDir = saveDir
         self.start()
 
     def run(self):
         self.mediaItem.onBeginConversion()
-        result, error = convert(self.mediaItem)
+        result, error = convert(self.mediaItem, self.saveDir)
         self.mediaItem.onConverted(result, error)
