@@ -11,8 +11,10 @@ Supported conversion operations are listed below
 - gif from videos
 
 ### How to Use
-Run convert-it.py
+- Install ffmpeg
+- Install modules at requirements.txt
+- Run convert-it.py
 
-You can drag-drop the media files you wish to convert and select save file and format
+You can drag&drop the media files you wish to convert
 
 <img src="doc/app.png" width="345" height="457"/>
