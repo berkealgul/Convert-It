@@ -10,6 +10,8 @@ Supported conversion operations are listed below
 - video-audio
 - gif from videos
 
+### How to Use
+Run convert-it.py
 You can drag-drop the media files you wish to convert and select save file and format
 
 <img src="doc/app.png" width="345" height="457"/>
