@@ -43,6 +43,11 @@ def convert(mediaItem, globalTargetDir=None):
         elif inputType == "Video" and targetType == "Audio":
             clip = mp.VideoFileClip(mediaItem.path)
             clip.audio.write_audiofile(targetPath)
+        elif inputType == "Video" and targetType == "Image":
+            if mediaItem.targetFormat == "gif":
+                clip = mp.VideoFileClip(mediaItem.path)
+                clip.write_gif(targetPath)
+
     except Exception as e:
         print(e)
         return UNKNOWN_ERROR, str(e)

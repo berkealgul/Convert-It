@@ -13,10 +13,11 @@ class MainWindow(QMainWindow):
         super().__init__()
         loadUi('qt_assets/mainwindow.ui', self)
         self.n_convertedItems = 0
-        self.globalSaveDir = None
+        self.globalSaveDir = self.getSaveDir()
         self.repoUrl = QUrl("https://github.com/berkealgul/Convert-It")
         self.setup_ui() 
-        self.TEST_CASE() # test case 
+        #self.TEST_CASE() # test case 
+        self.setTargetFormatByText("wav") # default format cause not causing bugs
         self.show()
         
     def setup_ui(self):
@@ -55,6 +56,10 @@ class MainWindow(QMainWindow):
         self.globalSaveDir += "/" # qt dosent add this at the end
         self.saveDirLabel.setText(str(self.globalSaveDir))
 
+        with open('./config.txt', "w") as config:
+            config.write(self.globalSaveDir)
+
+
     def updateProgressBar(self):
         self.n_convertedItems = self.n_convertedItems+1
         self.conversionProgressBar.setValue(self.n_convertedItems)
@@ -68,10 +73,11 @@ class MainWindow(QMainWindow):
                 item.setTargetFormat(self.globalTargetFormat)
                 self.converterThread.startConvertItem(item, self.globalSaveDir)
                 self.updateProgressBar()
-                return # exit from function after picking
+                return True # exit from function after picking return success
         
         # if couldnt find anything we reset the state
         self.idleState()
+        return False
 
     def abortConversion(self):
         self.converterThread.quit()
@@ -88,10 +94,16 @@ class MainWindow(QMainWindow):
             item.converted = False
             item.statusIconButton.setIcon(item.idleIcon)
 
-        self.convertButton.setEnabled(False)
-        self.conversionProgressBar.setMaximum(self.vbox.count())
-        self.pickItemToConvert()
-        self.stateLabel.setText("Converting...")
+        picked = self.pickItemToConvert()
+
+        print(picked)
+
+        if picked is True:
+            self.convertButton.setEnabled(False)
+            self.conversionProgressBar.setMaximum(self.vbox.count())
+            self.stateLabel.setText("Converting...")
+        else:
+            self.idleState()
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
@@ -107,6 +119,14 @@ class MainWindow(QMainWindow):
         self.converterThread.quit() # quit worker thread
         return super().closeEvent(event)
     
+    def getSaveDir(self):
+        try:
+            with open('./config.txt', "r") as config:
+                self.globalSaveDir = config.read()
+            self.saveDirLabel.setText(str(self.globalSaveDir))
+        except:
+            print("config not found")
+
     # this reverts every changes conversion state does
     def idleState(self):
         self.convertButton.setEnabled(True)
