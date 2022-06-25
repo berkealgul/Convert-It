@@ -1,6 +1,3 @@
-# Sound-Video-Converter
-Python gui base sound and video converter
+# Convert-It
 
-icons by <a target="_blank" href="https://icons8.com">Icons8</a>
-
-# wip
+GUI application to convert your media files
