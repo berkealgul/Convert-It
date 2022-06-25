@@ -247,7 +247,7 @@ QPushButton:hover{
    <widget class="QLabel" name="stateLabel">
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>160</x>
       <y>40</y>
       <width>101</width>
       <height>21</height>
@@ -271,6 +271,36 @@ QPushButton:hover{
     </property>
     <property name="text">
      <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="helpButton">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>40</y>
+      <width>61</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton{
+background-color: #40DD82;
+border-style: solid;
+border-color: black;
+border-width: 1px;
+border-radius: 10px;
+font: 63 8pt &quot;Segoe UI Semibold&quot;;
+color : black;
+}
+
+QPushButton:hover{ 
+ 	background-color:  #F4FBFB; 
+	color : black;
+}
+</string>
+    </property>
+    <property name="text">
+     <string>Help</string>
     </property>
    </widget>
   </widget>
